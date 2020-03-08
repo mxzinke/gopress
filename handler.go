@@ -1,6 +1,10 @@
 package gopress
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/jinzhu/copier"
+)
 
 // A Handler represents a function which returns a usable net/http HandlerFunc.
 // This make
@@ -8,6 +12,23 @@ type Handler func(http.HandlerFunc) http.HandlerFunc
 
 // The HandlerFunc is defining how the function for Handler creation should look like
 type HandlerFunc func(*Request, Response)
+
+// CreateHandler gives the possibility to create middleware or route handlers
+// by passing in a HandlerFunc which contains a Request and a Response.
+func CreateHandler(handleFunc HandlerFunc) Handler {
+	return func(f http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			request := new(Request)
+			copier.Copy(request, r)
+
+			request.Path = r.URL.Path
+
+			handleFunc(request, Response{w})
+
+			f(w, r)
+		}
+	}
+}
 
 // Chain combines multiple handlers to on handler
 func Chain(handlers ...Handler) Handler {
