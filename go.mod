@@ -1,4 +1,4 @@
-module github.com/mxzinke/go-press
+module github.com/mxzinke/gopress
 
 go 1.13
 
