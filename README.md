@@ -27,9 +27,9 @@ func main() {
     // Passed Middleware to the router will be always executed to 
     router := gopress.NewRouter(gopress.RouterSettings{
         TemplatesPath: "./public/templates",
-        SSL: true,
+        SSL: true, // Or make use of ENV with something like os.GetEnv("USE_SSL")
         SSLCertFile: "./path/to/cert/file",
-        SSLKeyFile: "./path/to/key/file",
+        SSLKeyFile: os.GetEnv("SSL_KEY_FILE"),
     }, gopress.Chain(LoggingMiddleware(os.GetEnv("LOGGING_PATH")), OtherMiddleware))
 
     router.AddRoute("/", gopress.RouteMethods{
@@ -53,7 +53,7 @@ func main() {
     router.AddFileServer("/static", "./public/static")
 
     port := os.GetEnv("PORT")
-    router.Start(8443)
+    router.Start(port)
 }
 
 // This is gopress.TemplateDataHandler function
