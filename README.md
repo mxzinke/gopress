@@ -19,18 +19,23 @@ package main
 
 import (
     "os"
+    "log"
 
     "github.com/mxzinke/gopress"
 )
 
 func main() {
-    // Passed Middleware to the router will be always executed to 
-    router := gopress.NewRouter(gopress.RouterSettings{
+    // Passed Middleware to the router will be always executed (at every request)
+    router, err := gopress.NewRouter(gopress.RouterSettings{
         TemplatesPath: "./public/templates",
-        SSL: true, // Or make use of ENV with something like os.GetEnv("USE_SSL")
+        UseSSL: true, // Or make use of ENV with something like os.GetEnv("USE_SSL")
         SSLCertFile: "./path/to/cert/file",
         SSLKeyFile: os.GetEnv("SSL_KEY_FILE"),
-    }, gopress.Chain(LoggingMiddleware(os.GetEnv("LOGGING_PATH")), OtherMiddleware))
+    }, LoggingMiddleware(os.GetEnv("LOGGING_PATH")), OtherMiddleware)
+
+    if err != nil {
+        log.Panic(err)
+    }
 
     router.AddRoute("/", gopress.RouteMethods{
         Get: gopress.Chain(AuthMiddleware, GetRouteHandler()),
@@ -53,7 +58,11 @@ func main() {
     router.AddFileServer("/static", "./public/static")
 
     port := os.GetEnv("PORT")
-    router.Start(port)
+    err := router.Start(port)
+
+    if err != nil {
+        log.Panic(err)
+    }
 }
 
 // This is gopress.TemplateDataHandler function
@@ -92,7 +101,7 @@ import (
 
 // GetRouteHandler ... Returns a gopress.Handler function,
 // depending if request should be logged to database
-func GetRouteHandler(saveRequestToDatabase boolean) gopress.Handler {
+func GetRouteHandler(saveRequestToDatabase bool) gopress.Handler {
     return gopress.CreateHandler(func(req *gopress.Request, res gopress.Response) {
         if saveRequestToDatabase {
             // ... Do something to save the request to database
