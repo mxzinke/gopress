@@ -30,7 +30,7 @@ func (router *Router) AddRoute(pattern string, methods RouteMethods) {
 
 	router.routes = append(router.routes, route)
 
-	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+	router.mux.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodHead && methods.Head != nil {
 			MakeHandlerExecuteable(methods.Head)(w, r)
 		} else if r.Method == http.MethodGet && methods.Get != nil {
