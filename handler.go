@@ -10,8 +10,11 @@ import (
 // This make
 type Handler func(http.HandlerFunc) http.HandlerFunc
 
-// The HandlerFunc is defining how the function for Handler creation should look like
-type HandlerFunc func(*Request, Response)
+// The HandlerFunc is defining how the function for Handler creation should look like.
+type HandlerFunc func(*Request, Response, NextHandler)
+
+// NextHandler is just a function which should be called when the next handler should go on.
+type NextHandler func()
 
 // CreateHandler gives the possibility to create middleware or route handlers
 // by passing in a HandlerFunc which contains a Request and a Response.
@@ -23,9 +26,9 @@ func CreateHandler(handleFunc HandlerFunc) Handler {
 
 			request.Path = r.URL.Path
 
-			handleFunc(request, Response{w})
-
-			f(w, r)
+			handleFunc(request, Response{w}, func() {
+				f(w, r)
+			})
 		}
 	}
 }

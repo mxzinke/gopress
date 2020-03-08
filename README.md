@@ -38,7 +38,7 @@ func main() {
     }
 
     router.AddRoute("/", gopress.RouteMethods{
-        Get: gopress.Chain(AuthMiddleware, GetRouteHandler()),
+        Get: gopress.Chain(AuthMiddleware, GetRouteHandler(true)),
         Post: gopress.Chain(AuthMiddleware, AdminPermissionMiddleware, AddItemRouteHandler()),
         // ...
     })
@@ -109,16 +109,14 @@ func GetRouteHandler(saveRequestToDatabase bool) gopress.Handler {
 
             err := saveRequest(req.Path)
             if err != nil {
-                res.sendStatus(gopress.StatusServerError)
+                res.SendStatus(gopress.StatusTeapot)
             }
         }
 
-        res.sendJSON(models.User{
+        res.SendJSON(models.User{
             Username: "mxzinke",
-            Repository: "gopress"
+            Repository: "gopress",
         })
-
-        next()
     })
 }
 

@@ -53,7 +53,10 @@ func (router *Router) Start(port int) error {
 
 func makeHTTPHandler(handler http.Handler, middleware Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		MakeHandlerExecuteable(middleware)(w, r)
-		handler.ServeHTTP(w, r)
+		handlerFunc := middleware(func(wf http.ResponseWriter, rf *http.Request) {
+			handler.ServeHTTP(wf, rf)
+		})
+
+		handlerFunc(w, r)
 	})
 }
