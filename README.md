@@ -58,8 +58,8 @@ func main() {
     router.AddFileServer("/static", "./public/static")
 
     port := os.GetEnv("PORT")
-    err := router.Start(port)
 
+    err = router.Start(port)
     if err != nil {
         log.Panic(err)
     }
@@ -102,7 +102,7 @@ import (
 // GetRouteHandler ... Returns a gopress.Handler function,
 // depending if request should be logged to database
 func GetRouteHandler(saveRequestToDatabase bool) gopress.Handler {
-    return gopress.CreateHandler(func(req *gopress.Request, res gopress.Response) {
+    return gopress.CreateHandler(func(req *gopress.Request, res gopress.Response, next gopress.NextHandler) {
         if saveRequestToDatabase {
             // ... Do something to save the request to database
             // for example to save the path with req.Path 
@@ -126,11 +126,13 @@ func GetRouteHandler(saveRequestToDatabase bool) gopress.Handler {
 // when you anyway just want to have a static handler
 
 // StaticLoggingMiddleware ... logs every request with log package
-var StaticLoggingMiddleware = gopress.CreateHandler(func(req *gopress.Request, res gopress.Response) {
+var StaticLoggingMiddleware = gopress.CreateHandler(func(req *gopress.Request, res gopress.Response, next gopress.NextHandler) {
 	start := time.Now()
     defer func() {
         log.Println(req.RemoteAddr, req.Method, req.Path, time.Since(start))
     }()
+
+    next()
 })
 
 // ...
