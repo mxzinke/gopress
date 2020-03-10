@@ -1,8 +1,10 @@
 # GoPress
 
+> This Package is currently under construction and is not yet ready to be used, feel free to contribute!
+
 GoPress is a super easy to use router with a stolen idea from the nice Express.js framework used by a wide majority of Node.js users.
 
-The package makes internally usage of the net/http package and provides a easy usage of routes, middlewares and other features like file server and template serving.
+The package makes internally usage of the net/http package and provides a easy usage of routes, middleware and other features like file server and template serving.
 
 ## Installation
 
